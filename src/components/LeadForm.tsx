@@ -14,12 +14,11 @@ import {
 import { toast } from "sonner";
 
 const eventTypes = [
-  "Conferencia",
-  "Concierto",
+  "Congreso",
+  "Charla / Ponencia",
+  "Podcast",
+  "Lanzamiento en vivo",
   "Evento corporativo",
-  "Boda",
-  "Streaming en vivo",
-  "Evento deportivo",
   "Otro",
 ];
 
@@ -37,13 +36,22 @@ const LeadForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase.functions.invoke("send-lead-email", {
+        body: formData,
+      });
 
-    setIsLoading(false);
-    setIsSubmitted(true);
-    toast.success("¡Solicitud enviada correctamente!");
-    console.log("Form submitted:", formData);
+      if (error) throw error;
+
+      setIsSubmitted(true);
+      toast.success("¡Solicitud enviada correctamente!");
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.error("Error al enviar la solicitud. Por favor, inténtalo de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {
