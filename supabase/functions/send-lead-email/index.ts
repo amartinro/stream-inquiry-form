@@ -13,6 +13,7 @@ interface LeadEmailRequest {
   businessName: string;
   eventType: string;
   eventDate: string;
+  phone: string;
   email: string;
 }
 
@@ -23,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { businessName, eventType, eventDate, email }: LeadEmailRequest = await req.json();
+    const { businessName, eventType, eventDate, phone, email }: LeadEmailRequest = await req.json();
 
     console.log("Sending lead notification email for:", businessName);
 
@@ -38,6 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
           <li><strong>Nombre del negocio:</strong> ${businessName}</li>
           <li><strong>Tipo de evento:</strong> ${eventType}</li>
           <li><strong>Fecha del evento:</strong> ${eventDate}</li>
+          <li><strong>Teléfono:</strong> ${phone}</li>
           <li><strong>Email de contacto:</strong> ${email}</li>
         </ul>
         <p>¡Contacta con ellos cuanto antes!</p>

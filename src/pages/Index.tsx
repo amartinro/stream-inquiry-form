@@ -44,8 +44,8 @@ const Index = () => {
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8">
-                Grabación y streaming profesional para conferencias, conciertos,
-                bodas y todo tipo de eventos. Lleva tu evento más allá de las
+                Grabación y streaming profesional para congresos, charlas,
+                podcasts y lanzamientos en vivo. Lleva tu evento más allá de las
                 cuatro paredes.
               </p>
 
@@ -56,11 +56,11 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse-glow" />
-                  <span>Grabación 4K</span>
+                  <span>Multicámara</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse-glow" />
-                  <span>Multi-cámara</span>
+                  <span>Entrega de vídeo</span>
                 </div>
               </div>
             </motion.div>
@@ -76,11 +76,35 @@ const Index = () => {
       {/* Features Section */}
       <Features />
 
+      {/* Social Content Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/30">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Video className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Contenido editado para redes sociales
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Además de la grabación completa de tu evento, ofrecemos la posibilidad de elaborar 
+              contenido editado y optimizado para su publicación en redes sociales. Clips destacados, 
+              resúmenes, momentos clave... todo listo para maximizar el alcance de tu evento.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm text-muted-foreground">
-            © 2026 EventStream Pro. Todos los derechos reservados.
+            © 2026. Alberto Martín. Todos los derechos reservados.
           </p>
         </div>
       </footer>

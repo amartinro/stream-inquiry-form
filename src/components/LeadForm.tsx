@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Building2, Mail, Sparkles, Check } from "lucide-react";
+import { Calendar, Building2, Mail, Sparkles, Check, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ const LeadForm = () => {
     businessName: "",
     eventType: "",
     eventDate: "",
+    phone: "",
     email: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -143,6 +144,26 @@ const LeadForm = () => {
               value={formData.eventDate}
               onChange={(e) =>
                 setFormData({ ...formData, eventDate: e.target.value })
+              }
+              required
+              className="pl-10 bg-muted border-border focus:ring-primary"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone" className="text-foreground/80">
+            Teléfono de contacto
+          </Label>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+34 600 000 000"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
               }
               required
               className="pl-10 bg-muted border-border focus:ring-primary"
