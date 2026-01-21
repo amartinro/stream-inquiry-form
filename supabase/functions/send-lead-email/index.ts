@@ -4,8 +4,10 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-// Odoo configuration
-const ODOO_URL = Deno.env.get("ODOO_URL");
+// Odoo configuration - clean URL to ensure it's the base domain without trailing paths
+const rawOdooUrl = Deno.env.get("ODOO_URL") || "";
+// Remove trailing /odoo, /web, or trailing slashes
+const ODOO_URL = rawOdooUrl.replace(/\/(odoo|web)?\/?$/, "");
 const ODOO_DB = Deno.env.get("ODOO_DB");
 const ODOO_USER = Deno.env.get("ODOO_USER");
 const ODOO_API_KEY = Deno.env.get("ODOO_API_KEY");
@@ -69,6 +71,8 @@ const checkRateLimit = (ip: string): boolean => {
 
 // Odoo JSON-RPC helper
 async function odooJsonRpc(url: string, method: string, params: Record<string, unknown>) {
+  console.log("Odoo request to:", url);
+  
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -80,15 +84,31 @@ async function odooJsonRpc(url: string, method: string, params: Record<string, u
     }),
   });
   
-  const result = await response.json();
-  if (result.error) {
-    throw new Error(result.error.data?.message || result.error.message || "Odoo API error");
+  const responseText = await response.text();
+  console.log("Odoo response status:", response.status);
+  
+  // Check if response is HTML (error page) instead of JSON
+  if (responseText.trim().startsWith("<!") || responseText.trim().startsWith("<html")) {
+    console.error("Odoo returned HTML instead of JSON. First 200 chars:", responseText.substring(0, 200));
+    throw new Error(`Odoo devolvió una página HTML en lugar de JSON. Verifica que la URL "${ODOO_URL}" sea correcta.`);
   }
-  return result.result;
+  
+  try {
+    const result = JSON.parse(responseText);
+    if (result.error) {
+      throw new Error(result.error.data?.message || result.error.message || "Odoo API error");
+    }
+    return result.result;
+  } catch (parseError) {
+    console.error("Failed to parse Odoo response:", responseText.substring(0, 500));
+    throw new Error(`Error al parsear respuesta de Odoo: ${parseError}`);
+  }
 }
 
 // Authenticate with Odoo and get user ID
 async function odooAuthenticate(): Promise<number> {
+  console.log("Authenticating with Odoo. Base URL:", ODOO_URL, "DB:", ODOO_DB, "User:", ODOO_USER);
+  
   const authUrl = `${ODOO_URL}/web/session/authenticate`;
   const result = await odooJsonRpc(authUrl, "call", {
     db: ODOO_DB,
@@ -96,8 +116,9 @@ async function odooAuthenticate(): Promise<number> {
     password: ODOO_API_KEY,
   });
   
-  if (!result.uid) {
-    throw new Error("Failed to authenticate with Odoo");
+  if (!result || !result.uid) {
+    console.error("Odoo auth result:", result);
+    throw new Error("No se pudo autenticar con Odoo. Verifica las credenciales.");
   }
   
   console.log("Odoo authentication successful, user ID:", result.uid);
