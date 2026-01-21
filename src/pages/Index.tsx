@@ -65,9 +65,25 @@ const Index = () => {
               </div>
             </motion.div>
 
-            {/* Right Content - Form */}
-            <div className="lg:pl-8">
+            {/* Right Content - Form + WhatsApp */}
+            <div className="lg:pl-8 space-y-4">
               <LeadForm />
+              
+              {/* Mini WhatsApp CTA */}
+              <motion.a
+                href="https://wa.me/34665651344?text=Hola%2C%20quiero%20informaci%C3%B3n"
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center justify-center gap-3 bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-semibold py-4 px-6 rounded-xl shadow-lg shadow-[#25D366]/20 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>O escríbeme directamente por WhatsApp</span>
+              </motion.a>
             </div>
           </div>
         </div>
@@ -104,7 +120,7 @@ const Index = () => {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.a
-            href="https://wa.me/34665651344?text=Hola%20Alberto,%20me%20interesa%20conocer%20más%20sobre%20tus%20servicios%20de%20grabación%20y%20streaming."
+            href="https://wa.me/34665651344?text=Hola%2C%20quiero%20informaci%C3%B3n"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -140,13 +156,6 @@ const Index = () => {
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                  </div>
-                </div>
-                
-                {/* Phone number badge */}
-                <div className="flex-shrink-0">
-                  <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-full px-6 py-3">
-                    <span className="text-[#25D366] font-mono font-semibold">+34 665 651 344</span>
                   </div>
                 </div>
               </div>
