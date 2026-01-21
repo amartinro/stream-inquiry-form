@@ -79,10 +79,13 @@ const Index = () => {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center justify-center gap-3 bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-semibold py-4 px-6 rounded-xl shadow-lg shadow-[#25D366]/20 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all"
+                className="group flex items-center justify-center gap-3 bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-semibold py-4 px-6 rounded-xl shadow-lg shadow-[#25D366]/20 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all"
               >
-                <MessageCircle className="w-5 h-5" />
-                <span>O escríbeme directamente por WhatsApp</span>
+                <MessageCircle className="w-5 h-5 flex-shrink-0 group-hover:animate-pulse" />
+                <span className="whitespace-nowrap text-sm md:text-base">Escríbeme por WhatsApp</span>
+                <svg className="w-4 h-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
               </motion.a>
             </div>
           </div>
