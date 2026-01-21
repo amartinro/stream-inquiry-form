@@ -4,6 +4,12 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+// Odoo configuration
+const ODOO_URL = Deno.env.get("ODOO_URL");
+const ODOO_DB = Deno.env.get("ODOO_DB");
+const ODOO_USER = Deno.env.get("ODOO_USER");
+const ODOO_API_KEY = Deno.env.get("ODOO_API_KEY");
+
 // Allowed origins for CORS - restrict to known domains
 const ALLOWED_ORIGINS = [
   "https://stream-inquiry-form.lovable.app",
@@ -59,6 +65,76 @@ const checkRateLimit = (ip: string): boolean => {
   record.count++;
   return true;
 };
+
+// Odoo JSON-RPC helper
+async function odooJsonRpc(url: string, method: string, params: Record<string, unknown>) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method: "call",
+      params: { ...params },
+      id: Date.now(),
+    }),
+  });
+  
+  const result = await response.json();
+  if (result.error) {
+    throw new Error(result.error.data?.message || result.error.message || "Odoo API error");
+  }
+  return result.result;
+}
+
+// Authenticate with Odoo and get user ID
+async function odooAuthenticate(): Promise<number> {
+  const authUrl = `${ODOO_URL}/web/session/authenticate`;
+  const result = await odooJsonRpc(authUrl, "call", {
+    db: ODOO_DB,
+    login: ODOO_USER,
+    password: ODOO_API_KEY,
+  });
+  
+  if (!result.uid) {
+    throw new Error("Failed to authenticate with Odoo");
+  }
+  
+  console.log("Odoo authentication successful, user ID:", result.uid);
+  return result.uid;
+}
+
+// Create a lead in Odoo CRM
+async function createOdooLead(data: {
+  businessName: string;
+  eventType: string;
+  eventDate: string;
+  phone: string;
+  email: string;
+}): Promise<number> {
+  // First authenticate
+  await odooAuthenticate();
+  
+  const createUrl = `${ODOO_URL}/web/dataset/call_kw`;
+  
+  const leadData = {
+    name: `${data.businessName} - ${data.eventType}`,
+    contact_name: data.businessName,
+    email_from: data.email,
+    phone: data.phone,
+    description: `Tipo de evento: ${data.eventType}\nFecha del evento: ${data.eventDate}\nTeléfono: ${data.phone}\nEmail: ${data.email}`,
+    type: "lead",
+  };
+  
+  const result = await odooJsonRpc(createUrl, "call", {
+    model: "crm.lead",
+    method: "create",
+    args: [leadData],
+    kwargs: {},
+  });
+  
+  console.log("Odoo lead created with ID:", result);
+  return result;
+}
 
 const getClientIp = (req: Request): string => {
   return (
@@ -155,7 +231,24 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Email sent successfully:", emailResponse);
 
-    return new Response(JSON.stringify(emailResponse), {
+    // Create lead in Odoo CRM (non-blocking, we don't want to fail the request if Odoo fails)
+    let odooLeadId: number | null = null;
+    try {
+      if (ODOO_URL && ODOO_DB && ODOO_USER && ODOO_API_KEY) {
+        odooLeadId = await createOdooLead(parseResult.data);
+        console.log("Odoo lead created successfully, ID:", odooLeadId);
+      } else {
+        console.warn("Odoo configuration incomplete, skipping lead creation");
+      }
+    } catch (odooError) {
+      console.error("Error creating Odoo lead (non-blocking):", odooError);
+      // Don't fail the request, email was sent successfully
+    }
+
+    return new Response(JSON.stringify({ 
+      email: emailResponse,
+      odooLeadId: odooLeadId 
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
