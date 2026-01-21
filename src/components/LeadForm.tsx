@@ -140,7 +140,7 @@ const LeadForm = () => {
             Fecha del evento
           </Label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
             <Input
               id="eventDate"
               type="date"
@@ -149,7 +149,7 @@ const LeadForm = () => {
                 setFormData({ ...formData, eventDate: e.target.value })
               }
               required
-              className="pl-10 bg-muted border-border focus:ring-primary"
+              className="pl-10 bg-muted border-border focus:ring-primary w-full min-w-0 appearance-none [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
             />
           </div>
         </div>
