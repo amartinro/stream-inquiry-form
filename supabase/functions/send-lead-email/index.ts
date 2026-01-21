@@ -4,10 +4,19 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+// Allowed origins for CORS - restrict to known domains
+const ALLOWED_ORIGINS = [
+  "https://stream-inquiry-form.lovable.app",
+  "https://id-preview--58b24a45-b0e8-4667-b4f5-3cd9ca534db1.lovable.app",
+];
+
+const getCorsHeaders = (origin: string | null) => {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Vary": "Origin",
+  };
 };
 
 // Input validation schema
@@ -60,13 +69,28 @@ const getClientIp = (req: Request): string => {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Validate origin - reject requests from unknown origins
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    console.warn(`Request from unauthorized origin: ${origin}`);
+    return new Response(
+      JSON.stringify({ error: "Origin not allowed" }),
+      {
+        status: 403,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   const clientIp = getClientIp(req);
-  console.log(`Request from IP: ${clientIp}`);
+  console.log(`Request from IP: ${clientIp}, Origin: ${origin || 'none'}`);
 
   // Check rate limit
   if (!checkRateLimit(clientIp)) {
