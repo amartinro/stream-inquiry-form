@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Video } from "lucide-react";
+import { Video, MessageCircle } from "lucide-react";
 import LeadForm from "@/components/LeadForm";
 import Features from "@/components/Features";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -97,6 +97,61 @@ const Index = () => {
               resúmenes, momentos clave... todo listo para maximizar el alcance de tu evento.
             </p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* WhatsApp CTA Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.a
+            href="https://wa.me/34665651344?text=Hola%20Alberto,%20me%20interesa%20conocer%20más%20sobre%20tus%20servicios%20de%20grabación%20y%20streaming."
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="block relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#25D366] to-[#128C7E] p-1 shadow-2xl shadow-[#25D366]/20"
+          >
+            <div className="relative bg-background/95 backdrop-blur-sm rounded-[22px] p-8 md:p-12">
+              {/* Glow effect */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#25D366]/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                {/* Icon */}
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-[#25D366] to-[#128C7E] rounded-2xl flex items-center justify-center shadow-lg shadow-[#25D366]/30 animate-pulse">
+                    <MessageCircle className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                    ¿Prefieres hablar directamente?
+                  </h3>
+                  <p className="text-muted-foreground text-lg mb-4">
+                    Escríbeme por WhatsApp y resolvemos tus dudas al momento. Sin compromisos.
+                  </p>
+                  <div className="inline-flex items-center gap-2 text-[#25D366] font-semibold text-lg">
+                    <span>Iniciar conversación</span>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {/* Phone number badge */}
+                <div className="flex-shrink-0">
+                  <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-full px-6 py-3">
+                    <span className="text-[#25D366] font-mono font-semibold">+34 665 651 344</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.a>
         </div>
       </section>
 
