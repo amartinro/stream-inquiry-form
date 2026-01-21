@@ -102,10 +102,32 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t border-border py-8 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-sm text-muted-foreground">
-            © 2026. Alberto Martín. Todos los derechos reservados.
-          </p>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2026. Alberto Martín. Todos los derechos reservados.
+            </p>
+            <nav className="flex flex-wrap justify-center gap-4 text-sm">
+              <a
+                href="/aviso-legal"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Aviso Legal
+              </a>
+              <a
+                href="/politica-privacidad"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Política de Privacidad
+              </a>
+              <a
+                href="/politica-cookies"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Política de Cookies
+              </a>
+            </nav>
+          </div>
         </div>
       </footer>
     </div>

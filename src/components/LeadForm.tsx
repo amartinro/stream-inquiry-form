@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, Building2, Mail, Sparkles, Check, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -30,6 +32,7 @@ const LeadForm = () => {
     phone: "",
     email: "",
   });
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -192,9 +195,33 @@ const LeadForm = () => {
         </div>
       </div>
 
+      <div className="flex items-start space-x-3">
+        <Checkbox
+          id="privacy"
+          checked={acceptedPrivacy}
+          onCheckedChange={(checked) => setAcceptedPrivacy(checked as boolean)}
+          required
+        />
+        <Label
+          htmlFor="privacy"
+          className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
+        >
+          He leído y acepto la{" "}
+          <Link
+            to="/politica-privacidad"
+            className="text-primary hover:underline"
+            target="_blank"
+          >
+            Política de Privacidad
+          </Link>{" "}
+          y consiento el tratamiento de mis datos para recibir información sobre
+          los servicios solicitados.
+        </Label>
+      </div>
+
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !acceptedPrivacy}
         className="w-full bg-gradient-primary text-primary-foreground font-semibold py-6 rounded-xl hover:opacity-90 transition-opacity glow-effect"
       >
         {isLoading ? "Enviando..." : "Solicitar información"}
