@@ -14,6 +14,7 @@ const ODOO_API_KEY = Deno.env.get("ODOO_API_KEY");
 const ALLOWED_ORIGINS = [
   "https://stream-inquiry-form.lovable.app",
   "https://id-preview--58b24a45-b0e8-4667-b4f5-3cd9ca534db1.lovable.app",
+  "https://58b24a45-b0e8-4667-b4f5-3cd9ca534db1.lovableproject.com",
 ];
 
 const getCorsHeaders = (origin: string | null) => {
@@ -231,18 +232,49 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Email sent successfully:", emailResponse);
 
-    // Create lead in Odoo CRM (non-blocking, we don't want to fail the request if Odoo fails)
+    // Create lead in Odoo CRM
     let odooLeadId: number | null = null;
+    let odooError: string | null = null;
+    
     try {
       if (ODOO_URL && ODOO_DB && ODOO_USER && ODOO_API_KEY) {
         odooLeadId = await createOdooLead(parseResult.data);
         console.log("Odoo lead created successfully, ID:", odooLeadId);
       } else {
+        odooError = "Configuración de Odoo incompleta (faltan variables de entorno)";
         console.warn("Odoo configuration incomplete, skipping lead creation");
       }
-    } catch (odooError) {
-      console.error("Error creating Odoo lead (non-blocking):", odooError);
-      // Don't fail the request, email was sent successfully
+    } catch (err: any) {
+      odooError = err.message || "Error desconocido al crear lead en Odoo";
+      console.error("Error creating Odoo lead:", err);
+    }
+
+    // If Odoo failed, send error notification email
+    if (odooError) {
+      try {
+        await resend.emails.send({
+          from: "Leads <onboarding@resend.dev>",
+          to: ["a.martinro@gmail.com"],
+          subject: `⚠️ Error Odoo: ${safeBusinessName} - ${safeEventType}`,
+          html: `
+            <h1 style="color: #dc2626;">⚠️ Error al crear lead en Odoo</h1>
+            <p>El email de notificación se envió correctamente, pero hubo un error al crear el lead en Odoo:</p>
+            <p style="background: #fef2f2; padding: 12px; border-radius: 8px; color: #991b1b;"><strong>Error:</strong> ${sanitizeHtml(odooError)}</p>
+            <h2>Datos del lead:</h2>
+            <ul>
+              <li><strong>Nombre del negocio:</strong> ${safeBusinessName}</li>
+              <li><strong>Tipo de evento:</strong> ${safeEventType}</li>
+              <li><strong>Fecha del evento:</strong> ${safeEventDate}</li>
+              <li><strong>Teléfono:</strong> ${safePhone}</li>
+              <li><strong>Email de contacto:</strong> ${safeEmail}</li>
+            </ul>
+            <p><strong>Acción requerida:</strong> Añade este lead manualmente a Odoo.</p>
+          `,
+        });
+        console.log("Odoo error notification email sent");
+      } catch (notifyErr) {
+        console.error("Failed to send Odoo error notification email:", notifyErr);
+      }
     }
 
     return new Response(JSON.stringify({ 
